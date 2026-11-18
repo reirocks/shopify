@@ -1,3 +1,4 @@
+
 {
   "name": "multi-brand-platform",
   "private": true,
@@ -8,10 +9,12 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-"dependencies": {
-  "@vitejs/plugin-react": "latest",
-  "vite": "latest",
-  "react": "latest",
-  "react-dom": "latest",
-  "@supabase/supabase-js": "^2.0.0"
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "@supabase/supabase-js": "^2.0.0"
+  },
+  "devDependencies": {}
 }
