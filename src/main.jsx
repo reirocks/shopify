@@ -9,6 +9,7 @@ function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [profile, setProfile] = useState(null);
+  const [memberships, setMemberships] = useState([]);
 const [products, setProducts] = useState([]);
 const [productsLoading, setProductsLoading] = useState(false);
 const [productsError, setProductsError] = useState('');
