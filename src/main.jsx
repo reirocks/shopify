@@ -1,3 +1,4 @@
+import { createRoot } from 'react-dom/client';
 import { useEffect, useState } from 'react';
 import { supabase } from './supabase';
 import './style.css';
