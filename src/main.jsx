@@ -235,24 +235,87 @@ if (brandIds.length > 0) {
           </>
         );
 
-      case 'Products':
-        return (
-          <section className="content-panel">
-            <p className="eyebrow">CATALOGUE</p>
-            <h1>Products</h1>
-            <p>
-              Your {currentBrand} product catalogue will appear here.
-            </p>
-            <div className="empty-state">
-              <h3>Product management is coming next</h3>
-              <p>
-                We'll connect this section to your Shopify products,
-                including product details, sales channels and status.
-              </p>
-            </div>
-          </section>
-        );
+      
+    case 'Products':
+  return (
+    <section className="products-page">
 
+      <div className="page-heading">
+        <div>
+          <p className="eyebrow">CATALOGUE</p>
+          <h1>Products</h1>
+          <p className="page-description">
+            Manage the products belonging to {currentBrand}.
+          </p>
+        </div>
+      </div>
+
+      <div className="products-toolbar">
+        <div>
+          <strong>{products.length}</strong>
+          <span> products</span>
+        </div>
+      </div>
+
+      {productsError && (
+        <p className="error-message">{productsError}</p>
+      )}
+
+      {productsLoading ? (
+        <div className="empty-state">
+          Loading products...
+        </div>
+      ) : products.length === 0 ? (
+        <div className="empty-state">
+          <h3>No products yet</h3>
+          <p>
+            Products assigned to {currentBrand} will appear here.
+            Once Shopify is connected, your catalogue can be
+            synchronized automatically.
+          </p>
+        </div>
+      ) : (
+        <div className="products-table-wrapper">
+          <table className="products-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Handle</th>
+                <th>Sales channel</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {products.map((product) => (
+                <tr key={product.id}>
+                  <td className="product-title">
+                    {product.title}
+                  </td>
+
+                  <td>{product.handle || '—'}</td>
+
+                  <td>
+                    <span className="channel-label">
+                      {product.sales_channel}
+                    </span>
+                  </td>
+
+                  <td>
+                    <span className={`status-label status-${product.status}`}>
+                      {product.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+    </section>
+  );
+        
       case 'Orders':
         return (
           <section className="content-panel">
