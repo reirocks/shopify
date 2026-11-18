@@ -1,3 +1,4 @@
+
 * {
   box-sizing: border-box;
 }
@@ -5,14 +6,20 @@
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
-  background: #f4f4f4;
   color: #171717;
+  background: #f5f5f5;
 }
 
 button,
 input {
   font: inherit;
 }
+
+button {
+  cursor: pointer;
+}
+
+/* LOGIN */
 
 .app {
   min-height: 100vh;
@@ -32,16 +39,16 @@ input {
 
 .eyebrow {
   margin: 0 0 14px;
-  font-size: 11px;
+  color: #888;
+  font-size: 10px;
   letter-spacing: 2px;
-  color: #777;
+  font-weight: 600;
 }
 
-h1 {
+.login-panel h1 {
   margin: 0;
   font-size: 32px;
   font-weight: 500;
-  letter-spacing: -1px;
 }
 
 .intro {
@@ -51,18 +58,18 @@ h1 {
   line-height: 1.6;
 }
 
-form {
+.login-panel form {
   display: flex;
   flex-direction: column;
 }
 
-label {
+.login-panel label {
   margin: 0 0 8px;
   font-size: 13px;
   font-weight: 600;
 }
 
-input {
+.login-panel input {
   width: 100%;
   height: 46px;
   margin-bottom: 22px;
@@ -73,35 +80,20 @@ input {
   outline: none;
 }
 
-input:focus {
+.login-panel input:focus {
   border-color: #333;
 }
 
-button {
-  width: 100%;
+.login-panel button {
   min-height: 48px;
-  margin-top: 6px;
   border: 1px solid #111;
   background: #111;
   color: #fff;
-  cursor: pointer;
-  transition: background 0.2s ease;
 }
 
-button:hover {
-  background: #333;
-}
-
-button:disabled {
+.login-panel button:disabled {
   opacity: 0.6;
   cursor: wait;
-}
-
-.error-message {
-  margin: 0 0 16px;
-  color: #c0392b;
-  font-size: 13px;
-  line-height: 1.5;
 }
 
 .footer-note {
@@ -112,71 +104,385 @@ button:disabled {
   letter-spacing: 1px;
 }
 
-.account-panel {
-  margin-top: 28px;
-}
-
-.welcome {
-  color: #39845a;
+.error-message {
+  color: #c0392b;
   font-size: 13px;
+  line-height: 1.5;
 }
 
-.account-panel h2 {
-  margin: 18px 0 5px;
-  font-size: 24px;
+/* DASHBOARD LAYOUT */
+
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  padding: 30px 22px 22px;
+  background: #171717;
+  color: #fff;
+}
+
+.sidebar-brand {
+  padding-bottom: 32px;
+  border-bottom: 1px solid #333;
+}
+
+.sidebar-brand .eyebrow {
+  color: #999;
+  font-size: 9px;
+}
+
+.sidebar-brand h2 {
+  margin: 0;
+  font-size: 21px;
   font-weight: 500;
 }
 
-.account-email {
-  margin: 0;
-  color: #777;
-  font-size: 13px;
-}
-
-.account-details {
-  margin-top: 30px;
-  padding: 20px 0;
-  border-top: 1px solid #e5e5e5;
-  border-bottom: 1px solid #e5e5e5;
-  font-size: 13px;
-}
-
-.account-details > p {
+.sidebar-workspace {
   display: flex;
-  justify-content: space-between;
-  gap: 16px;
+  flex-direction: column;
+  gap: 9px;
+  margin: 28px 0 35px;
+  padding: 15px;
+  background: #252525;
 }
 
-.brand-list {
-  margin-top: 24px;
+.workspace-label,
+.nav-label {
+  color: #888;
+  font-size: 9px;
+  letter-spacing: 1.5px;
 }
 
-.brand-list > strong {
-  display: block;
-  margin-bottom: 12px;
+.sidebar-workspace strong {
+  font-size: 14px;
+  font-weight: 500;
 }
 
-.brand-item {
+.sidebar-nav {
   display: flex;
-  justify-content: space-between;
-  padding: 12px;
-  margin: 0 0 8px;
-  background: #f5f5f5;
+  flex-direction: column;
+  gap: 5px;
 }
 
-.brand-item span {
-  color: #777;
-  font-size: 12px;
+.nav-label {
+  margin: 0 0 12px 10px;
 }
 
-.logout-button {
-  margin-top: 24px;
+.nav-item {
+  width: 100%;
+  padding: 13px 12px;
+  border: 0;
+  background: transparent;
+  color: #aaa;
+  text-align: left;
+  font-size: 13px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.nav-item:hover {
+  background: #292929;
+  color: #fff;
+}
+
+.nav-item.active {
   background: #fff;
   color: #111;
 }
 
+.sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid #333;
+  font-size: 12px;
+}
+
+.sidebar-footer span {
+  color: #ccc;
+}
+
+.sidebar-footer button {
+  width: fit-content;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #999;
+  font-size: 12px;
+  text-decoration: underline;
+}
+
+.dashboard-main {
+  width: calc(100% - 250px);
+  min-height: 100vh;
+  margin-left: 250px;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 68px;
+  padding: 0 42px;
+  border-bottom: 1px solid #e8e8e8;
+  background: rgba(255, 255, 255, 0.96);
+  font-size: 12px;
+}
+
+.topbar-role {
+  color: #777;
+  text-transform: capitalize;
+}
+
+.page-content {
+  width: 100%;
+  max-width: 1250px;
+  margin: 0 auto;
+  padding: 48px 42px;
+}
+
+.page-heading {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.page-heading h1,
+.content-panel h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.7px;
+}
+
+.page-description {
+  margin: 10px 0 0;
+  color: #777;
+  font-size: 14px;
+}
+
+/* DASHBOARD CONTENT */
+
+.welcome-panel {
+  padding: 30px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+}
+
+.welcome-panel .eyebrow {
+  margin-bottom: 12px;
+}
+
+.welcome-panel h2 {
+  margin: 0 0 12px;
+  font-size: 27px;
+  font-weight: 500;
+}
+
+.welcome-panel p:last-child {
+  max-width: 600px;
+  margin-bottom: 0;
+  color: #777;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 24px 0;
+}
+
+.dashboard-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 145px;
+  padding: 23px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+}
+
+.card-label {
+  color: #666;
+  font-size: 12px;
+}
+
+.dashboard-card strong {
+  font-size: 29px;
+  font-weight: 500;
+}
+
+.card-note {
+  color: #999;
+  font-size: 11px;
+}
+
+.content-panel {
+  padding: 30px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+}
+
+.content-panel > p:not(.eyebrow) {
+  color: #777;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.content-panel h3 {
+  margin-top: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.empty-state {
+  margin-top: 30px;
+  padding: 28px;
+  background: #f7f7f7;
+  border: 1px solid #eee;
+}
+
+.empty-state h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #777;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* ACCOUNT */
+
+.account-details {
+  max-width: 650px;
+  margin-top: 30px;
+  border-top: 1px solid #e8e8e8;
+}
+
+.account-details p {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 17px 0;
+  margin: 0;
+  border-bottom: 1px solid #e8e8e8;
+  font-size: 13px;
+}
+
+.account-details strong {
+  font-weight: 600;
+}
+
+.account-details span {
+  color: #777;
+  text-align: right;
+}
+
+.logout-button {
+  min-height: 42px;
+  margin-top: 30px;
+  padding: 0 22px;
+  border: 1px solid #222;
+  background: #fff;
+  color: #111;
+  font-size: 12px;
+}
+
 .logout-button:hover {
   background: #f2f2f2;
+}
+
+/* MOBILE */
+
+@media (max-width: 760px) {
+  .dashboard-layout {
+    display: block;
+  }
+
+  .sidebar {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .sidebar-brand {
+    padding-bottom: 18px;
+  }
+
+  .sidebar-workspace {
+    margin: 18px 0;
+  }
+
+  .sidebar-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .nav-label {
+    grid-column: 1 / -1;
+  }
+
+  .nav-item {
+    padding: 12px 10px;
+  }
+
+  .sidebar-footer {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+
+  .dashboard-main {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .topbar {
+    min-height: 55px;
+    padding: 0 20px;
+  }
+
+  .page-content {
+    padding: 30px 20px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .dashboard-card {
+    min-height: 115px;
+  }
+
+  .welcome-panel,
+  .content-panel {
+    padding: 22px;
+  }
+
+  .page-heading h1,
+  .content-panel h1 {
+    font-size: 26px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -184,7 +490,12 @@ button:disabled {
     padding: 36px 24px;
   }
 
-  h1 {
-    font-size: 28px;
+  .account-details p {
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .account-details span {
+    text-align: left;
   }
 }
