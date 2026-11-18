@@ -9,7 +9,9 @@ function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [profile, setProfile] = useState(null);
-  const [memberships, setMemberships] = useState([]);
+const [products, setProducts] = useState([]);
+const [productsLoading, setProductsLoading] = useState(false);
+const [productsError, setProductsError] = useState('');
   const [activePage, setActivePage] = useState('Dashboard');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -51,10 +53,10 @@ function App() {
         return;
       }
 
-      const { data: membershipData, error: membershipError } = await supabase
-        .from('brand_memberships')
-        .select('role, brands(name, slug)')
-        .eq('user_id', userId);
+const { data: membershipData, error: membershipError } = await supabase
+  .from('brand_memberships')
+  .select('brand_id, role, brands(name, slug)')
+  .eq('user_id', userId);
 
       if (membershipError) {
         setError(membershipError.message);
@@ -63,6 +65,31 @@ function App() {
 
       setProfile(profileData);
       setMemberships(membershipData ?? []);
+      const brandIds = (membershipData ?? []).map(
+  (membership) => membership.brand_id
+);
+
+if (brandIds.length > 0) {
+  setProductsLoading(true);
+  setProductsError('');
+
+  const { data: productData, error: productError } = await supabase
+    .from('products')
+    .select('id, title, handle, sales_channel, status, created_at')
+    .in('brand_id', brandIds)
+    .order('created_at', { ascending: false });
+
+  if (productError) {
+    setProductsError(productError.message);
+    setProducts([]);
+  } else {
+    setProducts(productData ?? []);
+  }
+
+  setProductsLoading(false);
+} else {
+  setProducts([]);
+}
       setActivePage('Dashboard');
       setError('');
     }
