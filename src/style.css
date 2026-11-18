@@ -499,3 +499,104 @@ button {
     text-align: left;
   }
 }
+
+/* =========================================
+   PRODUCTS
+========================================= */
+
+.products-page {
+  width: 100%;
+}
+
+.products-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 32px 0 18px;
+  padding: 16px 20px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #777;
+}
+
+.products-toolbar strong {
+  color: #111;
+  font-size: 18px;
+  margin-right: 4px;
+}
+
+.products-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+}
+
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.products-table th {
+  padding: 16px 20px;
+  background: #fafafa;
+  color: #777;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.products-table td {
+  padding: 18px 20px;
+  border-top: 1px solid #eee;
+  color: #555;
+  white-space: nowrap;
+}
+
+.products-table .product-title {
+  color: #111;
+  font-weight: 600;
+}
+
+.channel-label,
+.status-label {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 4px;
+  background: #f2f2f2;
+  color: #555;
+  font-size: 11px;
+  text-transform: capitalize;
+}
+
+.status-active {
+  background: #eaf4ed;
+  color: #34734a;
+}
+
+.status-draft {
+  background: #f3f0e8;
+  color: #8a7139;
+}
+
+.status-archived {
+  background: #eee;
+  color: #777;
+}
+
+@media (max-width: 760px) {
+  .products-table {
+    min-width: 650px;
+  }
+
+  .products-toolbar {
+    margin-top: 24px;
+  }
+}
