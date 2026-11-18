@@ -1,1 +1,2 @@
 # shopify
+Deployment sync check.
