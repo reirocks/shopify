@@ -3,8 +3,15 @@
   "name": "multi-brand-platform",
   "main": "worker.js",
   "compatibility_date": "2026-11-23",
+
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS"
+  },
+
+  "vars": {
+    "SHOPIFY_CLIENT_ID": "793a723962f631931237120e5b574719",
+    "SHOPIFY_STORE_DOMAIN": "multi-brand-platform-test-v3m9bb5x.myshopify.com",
+    "SUPABASE_URL": "https://hpdjvuqpcegbmtddsdbp.supabase.co"
   }
 }
