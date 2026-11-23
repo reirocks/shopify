@@ -2,10 +2,9 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Temporary Shopify connection test
+    // Shopify connection test
     if (url.pathname === "/api/shopify-test") {
       try {
-        // Request an access token from Shopify
         const tokenResponse = await fetch(
           `https://${env.SHOPIFY_STORE_DOMAIN}/admin/oauth/access_token`,
           {
@@ -26,12 +25,11 @@ export default {
 
         if (!tokenResponse.ok) {
           return Response.json(
-            { error: "Shopify authentication failed", details: tokenData },
+            { error: "Shopify authentication failed" },
             { status: 502 }
           );
         }
 
-        // Query Shopify products using the access token
         const shopifyResponse = await fetch(
           `https://${env.SHOPIFY_STORE_DOMAIN}/admin/api/2026-10/graphql.json`,
           {
@@ -60,15 +58,11 @@ export default {
 
         if (!shopifyResponse.ok || shopifyData.errors) {
           return Response.json(
-            {
-              error: "Shopify product query failed",
-              details: shopifyData
-            },
+            { error: "Shopify product query failed" },
             { status: 502 }
           );
         }
 
-        // Return the test results
         return Response.json({
           message: "Shopify connection successful!",
           store: env.SHOPIFY_STORE_DOMAIN,
@@ -79,8 +73,48 @@ export default {
 
       } catch (error) {
         return Response.json(
+          { error: "Shopify connection error", details: error.message },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Supabase connection test
+    if (url.pathname === "/api/supabase-test") {
+      try {
+        const response = await fetch(
+          `${env.SUPABASE_URL}/rest/v1/brands?select=id,name&limit=5`,
           {
-            error: "Connection error",
+            headers: {
+              apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+              Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+              Accept: "application/json"
+            }
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          return Response.json(
+            {
+              error: "Supabase query failed",
+              status: response.status,
+              details: data
+            },
+            { status: 502 }
+          );
+        }
+
+        return Response.json({
+          message: "Supabase connection successful!",
+          brands: data
+        });
+
+      } catch (error) {
+        return Response.json(
+          {
+            error: "Supabase connection error",
             details: error.message
           },
           { status: 500 }
@@ -88,7 +122,7 @@ export default {
       }
     }
 
-    // Serve the React application
+    // Serve React application
     return env.ASSETS.fetch(request);
   }
 };
