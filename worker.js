@@ -91,9 +91,20 @@ if (url.pathname === "/api/shopify-test") {
       }
     }
 
-    // Supabase connection test
-    if (url.pathname === "/api/supabase-test") {
-      try {
+// Supabase connection test
+if (url.pathname === "/api/supabase-test") {
+
+  if (
+    request.method !== "POST" ||
+    request.headers.get("Authorization") !== `Bearer ${env.SYNC_SECRET}`
+  ) {
+    return Response.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  try {
         const response = await fetch(
           `${env.SUPABASE_URL}/rest/v1/brands?select=id,name&limit=5`,
           {
