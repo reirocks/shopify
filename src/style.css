@@ -600,3 +600,268 @@ button {
     margin-top: 24px;
   }
 }
+
+/* PRODUCTS PAGE */
+
+.product-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.products-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 16px;
+  flex-wrap: wrap;
+}
+
+.product-search {
+  flex: 1;
+  min-width: 220px;
+}
+
+.product-search,
+.product-filter {
+  padding: 12px 14px;
+  border: 1px solid #dedede;
+  border-radius: 6px;
+  background: #fff;
+  color: #171717;
+  font: inherit;
+}
+
+.product-result-count {
+  color: #777;
+  font-size: 13px;
+  margin-left: auto;
+}
+
+.catalogue-table {
+  min-width: 850px;
+}
+
+.product-row {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.product-row:hover {
+  background: #f7f7f7;
+}
+
+.product-table-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 220px;
+}
+
+.product-table-item > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-table-item strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.product-table-item span {
+  color: #888;
+  font-size: 11px;
+}
+
+.product-thumbnail {
+  width: 54px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 5px;
+  background: #f0f0f0;
+  flex-shrink: 0;
+}
+
+.product-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 12px;
+}
+
+.back-button {
+  border: none;
+  background: none;
+  padding: 0;
+  margin-bottom: 24px;
+  color: #555;
+  cursor: pointer;
+  font: inherit;
+}
+
+.back-button:hover {
+  color: #000;
+}
+
+.product-detail-header {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+  margin-bottom: 28px;
+}
+
+.product-detail-image {
+  width: 220px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #f0f0f0;
+  flex-shrink: 0;
+}
+
+.product-detail-info {
+  padding-top: 8px;
+}
+
+.product-detail-info h1 {
+  margin: 8px 0 14px;
+}
+
+.product-detail-price {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 18px 0 8px;
+}
+
+.product-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.product-information-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-information-list p {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  margin: 0;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+}
+
+.product-information-list strong {
+  color: #777;
+  font-weight: 500;
+}
+
+.product-information-list span {
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.product-description {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #555;
+  overflow-wrap: anywhere;
+}
+
+.product-description img {
+  max-width: 100%;
+  height: auto;
+}
+
+.product-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 18px;
+}
+
+.product-tags span {
+  padding: 5px 9px;
+  border-radius: 4px;
+  background: #f1f1f1;
+  font-size: 11px;
+  color: #555;
+}
+
+.product-variants-panel {
+  margin-top: 20px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.section-heading h3 {
+  margin-bottom: 0;
+}
+
+.section-heading > span {
+  color: #888;
+  font-size: 12px;
+}
+
+@media (max-width: 700px) {
+  .product-summary-grid {
+    gap: 9px;
+  }
+
+  .product-summary-grid .dashboard-card {
+    padding: 14px;
+  }
+
+  .product-summary-grid .dashboard-card strong {
+    font-size: 22px;
+  }
+
+  .products-toolbar {
+    align-items: stretch;
+  }
+
+  .product-search {
+    flex-basis: 100%;
+  }
+
+  .product-filter {
+    flex: 1;
+  }
+
+  .product-result-count {
+    align-self: center;
+  }
+
+  .product-detail-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .product-detail-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    max-width: 320px;
+  }
+
+  .product-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .product-information-list p {
+    font-size: 12px;
+  }
+}
