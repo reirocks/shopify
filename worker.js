@@ -123,9 +123,21 @@ export default {
       }
     }
 
-    // Shopify -> Supabase product synchronization
-    if (url.pathname === "/api/products-sync") {
-      try {
+// Shopify -> Supabase product synchronization
+if (url.pathname === "/api/products-sync") {
+
+  // Require POST and a valid secret
+  if (
+    request.method !== "POST" ||
+    request.headers.get("Authorization") !== `Bearer ${env.SYNC_SECRET}`
+  ) {
+    return Response.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  try {
 
         // 1. Authenticate with Shopify
         const tokenResponse = await fetch(
