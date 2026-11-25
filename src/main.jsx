@@ -362,12 +362,25 @@ function getProductInventory(product) {
   </p>
 </div>
 
-            <div className="dashboard-grid">
-              <div className="dashboard-card">
-                <span className="card-label">Products</span>
-                <strong>—</strong>
-                <span className="card-note">Not connected yet</span>
-              </div>
+<div className="dashboard-grid">
+  <div className="dashboard-card">
+    <span className="card-label">Total products</span>
+    <strong>{totalProducts}</strong>
+    <span className="card-note">Products in your catalogue</span>
+  </div>
+
+  <div className="dashboard-card">
+    <span className="card-label">Active products</span>
+    <strong>{activeProducts}</strong>
+    <span className="card-note">Currently active</span>
+  </div>
+
+  <div className="dashboard-card">
+    <span className="card-label">Draft products</span>
+    <strong>{draftProducts}</strong>
+    <span className="card-note">Not yet published</span>
+  </div>
+</div>
 
               <div className="dashboard-card">
                 <span className="card-label">Orders</span>
@@ -383,13 +396,16 @@ function getProductInventory(product) {
             </div>
 
             <div className="content-panel">
-              <h3>Getting started</h3>
-              <p>
-                Your vendor portal is set up. We'll connect your Shopify
-                products and order information in the next development
-                stages.
-              </p>
-            </div>
+  <h3>Catalogue overview</h3>
+  <p>
+    Your Shopify product catalogue is synchronized with the
+    vendor portal. You can view product information, pricing,
+    variants and inventory from the Products section.
+  </p>
+  <p>
+    {archivedProducts} archived products in your catalogue.
+  </p>
+</div>
           </>
         );
 
