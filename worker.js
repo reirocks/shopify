@@ -3,9 +3,20 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Shopify connection test
-    if (url.pathname === "/api/shopify-test") {
-      try {
+// Shopify connection test
+if (url.pathname === "/api/shopify-test") {
+
+  if (
+    request.method !== "POST" ||
+    request.headers.get("Authorization") !== `Bearer ${env.SYNC_SECRET}`
+  ) {
+    return Response.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  try {
         const tokenResponse = await fetch(
           `https://${env.SHOPIFY_STORE_DOMAIN}/admin/oauth/access_token`,
           {
