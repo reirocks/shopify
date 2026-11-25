@@ -253,6 +253,19 @@ async function handleLogout() {
     .filter(Boolean);
 
   const currentBrand = brandNames[0] || 'Your Brand';
+  const totalProducts = products.length;
+
+const activeProducts = products.filter(
+  (product) => product.status === 'active'
+).length;
+
+const draftProducts = products.filter(
+  (product) => product.status === 'draft'
+).length;
+
+const archivedProducts = products.filter(
+  (product) => product.status === 'archived'
+).length;
 const filteredProducts = products.filter((product) => {
   const matchesSearch =
     product.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -340,15 +353,14 @@ function getProductInventory(product) {
               </div>
             </div>
 
-            <div className="welcome-panel">
-              <p className="eyebrow">YOUR BRAND</p>
-              <h2>{currentBrand}</h2>
-              <p>
-                Your brand workspace is ready. Products, orders and
-                fulfillment information will appear here as we connect
-                the platform to Shopify.
-              </p>
-            </div>
+<div className="welcome-panel">
+  <p className="eyebrow">My Page</p>
+  <h2>{currentBrand}</h2>
+  <p>
+    Welcome to your brand workspace. Your product catalogue
+    is connected and ready to manage.
+  </p>
+</div>
 
             <div className="dashboard-grid">
               <div className="dashboard-card">
