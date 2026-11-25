@@ -22,7 +22,10 @@ export default {
 
       try {
 
-        // 1. Authenticate with Shopify
+        // =====================================
+        // 1. AUTHENTICATE WITH SHOPIFY
+        // =====================================
+
         const tokenResponse = await fetch(
           `https://${env.SHOPIFY_STORE_DOMAIN}/admin/oauth/access_token`,
           {
@@ -53,7 +56,10 @@ export default {
           "X-Shopify-Access-Token": tokenData.access_token
         };
 
-        // 2. Retrieve brands from Supabase
+        // =====================================
+        // 2. RETRIEVE BRANDS FROM SUPABASE
+        // =====================================
+
         const brandsResponse = await fetch(
           `${env.SUPABASE_URL}/rest/v1/brands?select=id,name`,
           {
@@ -79,16 +85,24 @@ export default {
           brandMap[brand.name.trim().toLowerCase()] = brand.id;
         }
 
-        // 3. Retrieve all Shopify products using pagination
+        // =====================================
+        // 3. RETRIEVE SHOPIFY PRODUCTS
+        // =====================================
+
         let products = [];
         let cursor = null;
         let hasNextPage = true;
+        let shopCurrencyCode = null;
 
         while (hasNextPage) {
 
           const graphqlQuery = `
             query GetProducts($cursor: String) {
-              products(first: 100, after: $cursor) {
+              shop {
+                currencyCode
+              }
+
+              products(first: 10, after: $cursor) {
                 edges {
                   node {
                     id
@@ -96,8 +110,57 @@ export default {
                     handle
                     vendor
                     status
+                    descriptionHtml
+                    productType
+                    tags
+                    updatedAt
+
+                    featuredImage {
+                      url
+                      altText
+                    }
+
+                    images(first: 20) {
+                      edges {
+                        node {
+                          url
+                          altText
+                        }
+                      }
+                    }
+
+                    variants(first: 50) {
+                      edges {
+                        node {
+                          id
+                          title
+                          sku
+                          barcode
+                          price
+                          compareAtPrice
+                          position
+                          inventoryQuantity
+                          inventoryPolicy
+
+                          selectedOptions {
+                            name
+                            value
+                          }
+
+                          inventoryItem {
+                            tracked
+                          }
+                        }
+                      }
+
+                      pageInfo {
+                        hasNextPage
+                        endCursor
+                      }
+                    }
                   }
                 }
+
                 pageInfo {
                   hasNextPage
                   endCursor
@@ -113,9 +176,7 @@ export default {
               headers: shopifyHeaders,
               body: JSON.stringify({
                 query: graphqlQuery,
-                variables: {
-                  cursor
-                }
+                variables: { cursor }
               })
             }
           );
@@ -132,9 +193,113 @@ export default {
             );
           }
 
+          shopCurrencyCode =
+            shopifyData.data.shop.currencyCode;
+
           const edges = shopifyData.data.products.edges;
 
-          products.push(...edges.map(edge => edge.node));
+          // Collect products and their initial variants
+          for (const edge of edges) {
+
+            const product = edge.node;
+
+            product.allVariants =
+              product.variants.edges.map(edge => edge.node);
+
+            let variantCursor =
+              product.variants.pageInfo.endCursor;
+
+            let hasMoreVariants =
+              product.variants.pageInfo.hasNextPage;
+
+            // Retrieve additional variant pages
+            while (hasMoreVariants) {
+
+              const variantQuery = `
+                query GetMoreVariants(
+                  $productId: ID!,
+                  $cursor: String
+                ) {
+                  node(id: $productId) {
+                    ... on Product {
+                      variants(first: 250, after: $cursor) {
+                        edges {
+                          node {
+                            id
+                            title
+                            sku
+                            barcode
+                            price
+                            compareAtPrice
+                            position
+                            inventoryQuantity
+                            inventoryPolicy
+
+                            selectedOptions {
+                              name
+                              value
+                            }
+
+                            inventoryItem {
+                              tracked
+                            }
+                          }
+                        }
+
+                        pageInfo {
+                          hasNextPage
+                          endCursor
+                        }
+                      }
+                    }
+                  }
+                }
+              `;
+
+              const variantResponse = await fetch(
+                `https://${env.SHOPIFY_STORE_DOMAIN}/admin/api/2026-10/graphql.json`,
+                {
+                  method: "POST",
+                  headers: shopifyHeaders,
+                  body: JSON.stringify({
+                    query: variantQuery,
+                    variables: {
+                      productId: product.id,
+                      cursor: variantCursor
+                    }
+                  })
+                }
+              );
+
+              const variantData = await variantResponse.json();
+
+              if (!variantResponse.ok || variantData.errors) {
+                return Response.json(
+                  {
+                    error: "Shopify variant retrieval failed",
+                    product: product.title,
+                    details: variantData.errors || variantData
+                  },
+                  { status: 502 }
+                );
+              }
+
+              const variantConnection =
+                variantData.data.node.variants;
+
+              product.allVariants.push(
+                ...variantConnection.edges.map(edge => edge.node)
+              );
+
+              hasMoreVariants =
+                variantConnection.pageInfo.hasNextPage;
+
+              variantCursor =
+                variantConnection.pageInfo.endCursor;
+            }
+
+            products.push(product);
+          }
 
           hasNextPage =
             shopifyData.data.products.pageInfo.hasNextPage;
@@ -143,7 +308,10 @@ export default {
             shopifyData.data.products.pageInfo.endCursor;
         }
 
-        // 4. Match products to brands and prepare records
+        // =====================================
+        // 4. MATCH PRODUCTS TO BRANDS
+        // =====================================
+
         const matchedProducts = [];
         const skippedProducts = [];
 
@@ -164,25 +332,154 @@ export default {
             continue;
           }
 
+          const productImages =
+            product.images.edges.map(edge => ({
+              url: edge.node.url,
+              altText: edge.node.altText
+            }));
+
           matchedProducts.push({
             brand_id: brandId,
             shopify_product_id: product.id,
+
             title: product.title,
             handle: product.handle,
+            description: product.descriptionHtml,
+            vendor: product.vendor,
+            product_type: product.productType,
+
+            tags: product.tags,
+
+            featured_image_url:
+              product.featuredImage?.url || null,
+
+            images: productImages,
+
             sales_channel: "both",
-            status: product.status.toLowerCase()
+            status: product.status.toLowerCase(),
+
+            shopify_updated_at: product.updatedAt,
+            updated_at: new Date().toISOString(),
+
+            variants: product.allVariants
           });
         }
 
-        // 5. Upsert products into Supabase
-        let syncedCount = 0;
+        // =====================================
+        // 5. SAVE PRODUCTS TO SUPABASE
+        // =====================================
+
+        let syncedProductCount = 0;
+        let syncedVariantCount = 0;
+
+        const productIdMap = {};
 
         for (let i = 0; i < matchedProducts.length; i += 100) {
 
           const batch = matchedProducts.slice(i, i + 100);
 
+          const productRecords = batch.map(product => {
+            const { variants, ...record } = product;
+            return record;
+          });
+
           const syncResponse = await fetch(
             `${env.SUPABASE_URL}/rest/v1/products?on_conflict=shopify_product_id`,
+            {
+              method: "POST",
+              headers: {
+                apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+                Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+                "Content-Type": "application/json",
+                Prefer: "resolution=merge-duplicates,return=representation"
+              },
+              body: JSON.stringify(productRecords)
+            }
+          );
+
+          if (!syncResponse.ok) {
+            const syncError = await syncResponse.text();
+
+            return Response.json(
+              {
+                error: "Supabase product synchronization failed",
+                details: syncError,
+                successfullyProcessedBeforeFailure: syncedProductCount
+              },
+              { status: 502 }
+            );
+          }
+
+          const savedProducts = await syncResponse.json();
+
+          for (const savedProduct of savedProducts) {
+            productIdMap[savedProduct.shopify_product_id] =
+              savedProduct.id;
+          }
+
+          syncedProductCount += savedProducts.length;
+        }
+
+        // =====================================
+        // 6. PREPARE VARIANT RECORDS
+        // =====================================
+
+        const variantRecords = [];
+
+        for (const product of matchedProducts) {
+
+          const internalProductId =
+            productIdMap[product.shopify_product_id];
+
+          if (!internalProductId) {
+            return Response.json(
+              {
+                error: "Could not retrieve saved product ID",
+                product: product.title
+              },
+              { status: 502 }
+            );
+          }
+
+          for (const variant of product.variants) {
+
+            variantRecords.push({
+              product_id: internalProductId,
+
+              shopify_variant_id: variant.id,
+
+              title: variant.title,
+              sku: variant.sku,
+              barcode: variant.barcode,
+
+              price: variant.price,
+              compare_at_price: variant.compareAtPrice,
+              currency_code: shopCurrencyCode,
+
+              options: variant.selectedOptions,
+
+              position: variant.position,
+
+              inventory_quantity: variant.inventoryQuantity,
+              inventory_tracked: variant.inventoryItem?.tracked ?? null,
+              inventory_policy:
+                variant.inventoryPolicy?.toLowerCase() || null,
+
+              updated_at: new Date().toISOString()
+            });
+          }
+        }
+
+        // =====================================
+        // 7. SAVE VARIANTS TO SUPABASE
+        // =====================================
+
+        for (let i = 0; i < variantRecords.length; i += 100) {
+
+          const batch = variantRecords.slice(i, i + 100);
+
+          const variantResponse = await fetch(
+            `${env.SUPABASE_URL}/rest/v1/product_variants?on_conflict=shopify_variant_id`,
             {
               method: "POST",
               headers: {
@@ -195,32 +492,42 @@ export default {
             }
           );
 
-          if (!syncResponse.ok) {
-            const syncError = await syncResponse.text();
+          if (!variantResponse.ok) {
+            const variantError = await variantResponse.text();
 
             return Response.json(
               {
-                error: "Supabase product synchronization failed",
-                details: syncError,
-                successfullyProcessedBeforeFailure: syncedCount
+                error: "Supabase variant synchronization failed",
+                details: variantError,
+                successfullyProcessedBeforeFailure: syncedVariantCount
               },
               { status: 502 }
             );
           }
 
-          syncedCount += batch.length;
+          syncedVariantCount += batch.length;
         }
 
-        // 6. Return synchronization report
+        // =====================================
+        // 8. RETURN SYNCHRONIZATION REPORT
+        // =====================================
+
         return Response.json({
-          message: "Product synchronization successful!",
+          message: "Product and variant synchronization successful!",
+
           shopifyProductsFound: products.length,
-          productsSynced: syncedCount,
+          productsSynced: syncedProductCount,
           productsSkipped: skippedProducts.length,
+
+          variantsSynced: syncedVariantCount,
+
+          currency: shopCurrencyCode,
+
           skippedProducts
         });
 
       } catch (error) {
+
         return Response.json(
           {
             error: "Product synchronization error",
