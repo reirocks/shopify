@@ -537,7 +537,144 @@ export default {
         );
       }
     }
+    // =========================================
+    // SHOPIFY ORDERS ACCESS TEST (READ-ONLY)
+    // =========================================
 
+    if (url.pathname === "/api/orders-test") {
+      if (
+        request.method !== "POST" ||
+        request.headers.get("Authorization") !== `Bearer ${env.SYNC_SECRET}`
+      ) {
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
+      }
+
+      try {
+        const tokenResponse = await fetch(
+          `https://${env.SHOPIFY_STORE_DOMAIN}/admin/oauth/access_token`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              Accept: "application/json"
+            },
+            body: new URLSearchParams({
+              grant_type: "client_credentials",
+              client_id: env.SHOPIFY_CLIENT_ID,
+              client_secret: env.SHOPIFY_CLIENT_SECRET
+            })
+          }
+        );
+
+        const tokenData = await tokenResponse.json();
+
+        if (!tokenResponse.ok) {
+          return Response.json(
+            { error: "Shopify authentication failed", details: tokenData },
+            { status: 502 }
+          );
+        }
+
+        const testQuery = `
+          query OrdersAccessTest {
+            orders(first: 3, sortKey: CREATED_AT, reverse: true) {
+              edges {
+                node {
+                  id
+                  name
+                  createdAt
+                  displayFinancialStatus
+                  displayFulfillmentStatus
+                  shippingAddress {
+                    name
+                    firstName
+                    lastName
+                    address1
+                    address2
+                    city
+                    province
+                    provinceCode
+                    zip
+                    country
+                    countryCodeV2
+                    phone
+                  }
+                  lineItems(first: 10) {
+                    edges {
+                      node {
+                        title
+                        quantity
+                        sku
+                        variant {
+                          title
+                          product {
+                            vendor
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `;
+
+        const testResponse = await fetch(
+          `https://${env.SHOPIFY_STORE_DOMAIN}/admin/api/2026-10/graphql.json`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Shopify-Access-Token": tokenData.access_token
+            },
+            body: JSON.stringify({ query: testQuery })
+          }
+        );
+
+        const testData = await testResponse.json();
+
+        if (!testResponse.ok || testData.errors) {
+          return Response.json(
+            {
+              error: "Shopify orders access test failed",
+              details: testData.errors || testData
+            },
+            { status: 502 }
+          );
+        }
+
+        const orders = testData.data.orders.edges.map(({ node }) => ({
+          orderName: node.name,
+          createdAt: node.createdAt,
+          financialStatus: node.displayFinancialStatus,
+          fulfillmentStatus: node.displayFulfillmentStatus,
+          shippingAddress: node.shippingAddress,
+          items: node.lineItems.edges.map(({ node: item }) => ({
+            title: item.title,
+            quantity: item.quantity,
+            sku: item.sku,
+            variantTitle: item.variant?.title ?? null,
+            vendor: item.variant?.product?.vendor ?? null
+          }))
+        }));
+
+        return Response.json({
+          message: "Shopify orders access test successful",
+          ordersReturned: orders.length,
+          protectedShippingFieldsIncluded: orders.some(
+            order => order.shippingAddress !== null
+          ),
+          orders
+        });
+
+      } catch (error) {
+        return Response.json(
+          { error: "Orders access test error", details: error.message },
+          { status: 500 }
+        );
+      }
+    }
     // =========================================
     // UNKNOWN API ROUTES
     // =========================================
