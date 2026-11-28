@@ -1101,27 +1101,32 @@ export default {
 
           syncedOrders++;
 
-          for (const brandOrder of order.brandOrders) {
-            // Omit vendor_status, tracking_number and shipping_carrier.
-            // This preserves existing vendor fulfillment data on repeat sync.
-            await supabaseRequest(
-              "brand_orders?on_conflict=order_id,brand_id",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Prefer: "resolution=merge-duplicates,return=minimal"
-                },
-                body: JSON.stringify([{
-                  order_id: parentOrder.id,
-                  brand_id: brandOrder.brandId,
-                  shipping_address: brandOrder.shippingAddress,
-                  subtotal: brandOrder.subtotal,
-                  currency: brandOrder.currency,
-                  updated_at: new Date().toISOString()
-                }])
-              }
-            );
+
+for (const brandOrder of order.brandOrders) {
+  // Omit vendor_status, tracking_number and shipping_carrier.
+  // This preserves existing vendor fulfillment data on repeat sync.
+  await supabaseRequest(
+    "brand_orders?on_conflict=order_id,brand_id",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates,return=minimal"
+      },
+      body: JSON.stringify([{
+        order_id: parentOrder.id,
+        brand_id: brandOrder.brandId,
+        order_number: order.orderNumber,
+        ordered_at: order.orderedAt,
+        shipping_address: brandOrder.shippingAddress,
+        subtotal: brandOrder.subtotal,
+        currency: brandOrder.currency,
+        updated_at: new Date().toISOString()
+      }])
+    }
+  );
+}
+
 
             syncedBrandOrders++;
 
