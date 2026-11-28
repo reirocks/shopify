@@ -1125,8 +1125,6 @@ for (const brandOrder of order.brandOrders) {
       }])
     }
   );
-}
-
 
             syncedBrandOrders++;
 
